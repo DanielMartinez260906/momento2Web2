@@ -13,9 +13,14 @@ const Navbar = () => {
     navigate('/');
   };
 
+  const handleBrandClick = () => {
+    navigate('/');
+    setIsMenuOpen(false);
+  };
+
   return (
     <nav className="navbar">
-      <div className="brand">
+      <div className="brand" onClick={handleBrandClick} style={{ cursor: 'pointer' }}>
         <img className="brand-logo" src="/public/LOGO CRECIENDO JUNTOS.png" alt="Logo de Creciendo Juntos" />
         <span className="brand-name">Creciendo Juntos</span>
       </div>
@@ -30,11 +35,13 @@ const Navbar = () => {
 
       <div className={`nav-menu ${isMenuOpen ? 'open' : ''}`}>
         <ul>
-          <li>
-            <Link to="/" onClick={() => setIsMenuOpen(false)}>
-              Inicio
-            </Link>
-          </li>
+          {isAuthenticated && (
+            <li>
+              <Link to="/" onClick={() => setIsMenuOpen(false)}>
+                Inicio
+              </Link>
+            </li>
+          )}
           
           {isAuthenticated ? (
             <>

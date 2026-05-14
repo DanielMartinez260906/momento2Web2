@@ -3,15 +3,19 @@ import { useNavigate, Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { fetchPost } from '../api/config';
 import { ENDPOINTS } from '../api/endpoints';
+import { cursos } from '../data/courses';
 
 const Register = () => {
   const navigate = useNavigate();
+  const [userType, setUserType] = useState(null); // 'student' o 'teacher'
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     confirmPassword: '',
     age: '',
+    profesionalCard: '',
+    subject: '',
   });
   const [loading, setLoading] = useState(false);
 
@@ -27,7 +31,12 @@ const Register = () => {
     e.preventDefault();
 
     // Validaciones
-    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword || !formData.age) {
+    const requiredFields = [formData.name, formData.email, formData.password, formData.confirmPassword, formData.age];
+    if (userType === 'teacher') {
+      requiredFields.push(formData.profesionalCard, formData.subject);
+    }
+    
+    if (requiredFields.some(field => !field)) {
       Swal.fire({
         icon: 'warning',
         title: 'Campos requeridos',
@@ -84,10 +93,60 @@ const Register = () => {
     }
   };
 
+  if (!userType) {
+    return (
+      <div className="auth-container">
+        <div className="auth-card">
+          <h1>¿Cómo deseas registrarte?</h1>
+          <button
+            className="btn-back"
+            onClick={() => navigate('/')}
+            style={{ marginBottom: '20px', padding: '8px 16px', cursor: 'pointer' }}
+          >
+            ← Volver a inicio
+          </button>
+          <div className="user-type-selection">
+            <button
+              className="btn-user-type"
+              onClick={() => setUserType('student')}
+            >
+              📚 Registrar como Estudiante
+            </button>
+            <button
+              className="btn-user-type"
+              onClick={() => setUserType('teacher')}
+            >
+              👨‍🏫 Registrar como Docente
+            </button>
+          </div>
+          <p className="auth-footer">
+            ¿Ya tienes cuenta? <Link to="/login">Inicia sesión aquí</Link>
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h1>Registrarse</h1>
+        <h1>Registrarse como {userType === 'student' ? 'Estudiante' : 'Docente'}</h1>
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
+          <button
+            className="btn-back"
+            onClick={() => setUserType(null)}
+            style={{ flex: 1, padding: '8px 16px', cursor: 'pointer', minWidth: '150px' }}
+          >
+            ← Volver a seleccionar tipo
+          </button>
+          <button
+            className="btn-back"
+            onClick={() => navigate('/')}
+            style={{ flex: 1, padding: '8px 16px', cursor: 'pointer', minWidth: '150px' }}
+          >
+            🏠 Ir a inicio
+          </button>
+        </div>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="name">Nombre Completo</label>
@@ -151,6 +210,40 @@ const Register = () => {
               disabled={loading}
             />
           </div>
+          {userType === 'teacher' && (
+            <>
+              <div className="form-group">
+                <label htmlFor="profesionalCard">Tarjeta Profesional</label>
+                <input
+                  type="text"
+                  id="profesionalCard"
+                  name="profesionalCard"
+                  value={formData.profesionalCard}
+                  onChange={handleChange}
+                  placeholder="Número de tarjeta profesional"
+                  disabled={loading}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="subject">Materia a Enseñar</label>
+                <select
+                  id="subject"
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  disabled={loading}
+                  className="form-select"
+                >
+                  <option value="">Selecciona una materia</option>
+                  {cursos.map(curso => (
+                    <option key={curso.id} value={curso.nombre}>
+                      {curso.emoji} {curso.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </>
+          )}
           <button type="submit" disabled={loading} className="btn-primary">
             {loading ? 'Registrando...' : 'Registrarse'}
           </button>

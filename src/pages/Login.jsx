@@ -59,6 +59,13 @@ const Login = () => {
     <div className="auth-container">
       <div className="auth-card">
         <h1>Iniciar Sesión</h1>
+        <button
+          className="btn-back"
+          onClick={() => navigate('/')}
+          style={{ marginBottom: '20px', padding: '8px 16px', cursor: 'pointer' }}
+        >
+          ← Volver a inicio
+        </button>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="email">Email</label>
